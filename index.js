@@ -72,16 +72,15 @@ class ProductManager {
 
     async getProducts() {
       try {
-        const contenidoJson = await fs.readFile(this.path, 'utf8');
+        const contenidoJson = await fs.readFile(this.path, 'utf8')
         if (!contenidoJson.trim()) {
-          console.log('Archivo vacío. Aun no hay productos cargados.');
-          return []; // Devuelve un array vacío si el archivo está vacío
+          return [] // Devuelve un array vacío si el archivo está vacío
         }
-        const objetoRecuperado = JSON.parse(contenidoJson);
-        console.log(objetoRecuperado);
-        return objetoRecuperado; // Devuelve el array de productos
+        const objetoRecuperado = JSON.parse(contenidoJson)
+        console.log(objetoRecuperado)
+        return objetoRecuperado // Devuelve el array de productos
       } catch (error) {
-        console.error('No se puede leer el archivo, error:', error.message);
+        console.error('No se puede leer el archivo, error:', error.message)
       }
     }
 
