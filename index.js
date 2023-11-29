@@ -57,11 +57,11 @@ class ProductManager {
           return
         }
   
-        let productIndex = this.products.indexOf(product)
-        this.products[productIndex] = productUpdated
+      // Copia todas las propiedades del producto actualizado al producto encontrado
+      Object.assign(product, productUpdated);
   
         // Actualiza el archivo después de la modificación
-        this.updateFile()
+       await this.updateFile()
   
         console.log("Producto actualizado correctamente")
       } catch (error) {
@@ -77,7 +77,6 @@ class ProductManager {
           return [] // Devuelve un array vacío si el archivo está vacío
         }
         const objetoRecuperado = JSON.parse(contenidoJson)
-        console.log(objetoRecuperado)
         return objetoRecuperado // Devuelve el array de productos
       } catch (error) {
         console.error('No se puede leer el archivo, error:', error.message)
@@ -89,7 +88,7 @@ class ProductManager {
         const contenidoJson = await fs.readFile (this.path, 'utf8')
         const objetoRecuperado =  JSON.parse(contenidoJson)
         const findID = objetoRecuperado.find (product => product.id === id)
-        if (findID) return console.log (findID)
+        if (findID) return findID
       } catch (error) {
           console.log ('Not Found')
         } 
@@ -106,25 +105,25 @@ async function test() {
 
   // Agregar productos de prueba
   await productManager.addProduct('producto prueba1', 'Este es un producto prueba', 200, 'sin imagen', 'abc123', 25)
+  await productManager.addProduct('producto prueba2', 'Este es un producto prueba', 200, 'sin imagen', 'abc1233', 25)
 
   // Obtener los productos despues de agregar el de prueba
   const productsAfterAdd = await productManager.getProducts()
   console.log("Productos despues de agregar:", productsAfterAdd)
+
+  //buscar por id
+  const filterById =  await productManager.getProductByID(1)
+  console.log ('El producto buscado por ID es: ', filterById)
+ 
+  //modifico producto por id
+  await productManager.updateProduct({
+  id: 1,
+  title: 'producto modificado'
+})  
+ 
 }
 
 test()
 
-/* //modifico producto por id
-await productManager.updateProduct({
-  id: 1,
-  title: 'producto modificado',
-  description: 'Este es un producto modificado',
-  price: 300,
-  thumbnail: 'imagen modificada',
-  code: 'abc567',
-  stock: 30,
-}) 
- */
 
-/* //buscar por id
-await productManager.getProductByID(2) */
+
