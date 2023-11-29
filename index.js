@@ -36,7 +36,7 @@ class ProductManager {
       //incremento el ID solo si todos los chequeos pasan ok
       this.id++
       
-      this.updateFile()
+      await this.updateFile()
 
       }
 
