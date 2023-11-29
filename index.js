@@ -58,7 +58,7 @@ class ProductManager {
         }
   
       // Copia todas las propiedades del producto actualizado al producto encontrado
-      Object.assign(product, productUpdated);
+      Object.assign(product, productUpdated)
   
         // Actualiza el archivo después de la modificación
        await this.updateFile()
@@ -67,8 +67,7 @@ class ProductManager {
       } catch (error) {
         console.error("Error al actualizar el producto:", error.message)
       }
-    }
-  
+    }  
 
     async getProducts() {
       try {
@@ -93,8 +92,24 @@ class ProductManager {
           console.log ('Not Found')
         } 
     }
-  }
 
+    async deleteProduct(id) {
+      try {
+        const idExist = this.products.find(product => product.id === id)
+        if (idExist) {     
+         // Filtra los productos, excluyendo el producto con el id proporcionado
+        this.products = this.products.filter((product) => product.id !== id)
+
+        // Actualiza el archivo después de la modificación
+        await this.updateFile()
+  
+        console.log("Producto borrado correctamente")}
+
+      } catch (error) {
+        console.error("Error al borrar el producto:", error.message)
+      }
+    }
+  }
 
 async function test() {
   const productManager = new ProductManager('./archivo/products.json')
@@ -118,9 +133,10 @@ async function test() {
   //modifico producto por id
   await productManager.updateProduct({
   id: 1,
-  title: 'producto modificado'
-})  
+  title: 'producto modificado',
+  })  
  
+  await productManager.deleteProduct(2)
 }
 
 test()
