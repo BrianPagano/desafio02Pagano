@@ -36,21 +36,52 @@ class ProductManager {
       //incremento el ID solo si todos los chequeos pasan ok
       this.id++
       
+      this.updateFile()
+
+      }
+
+    async updateFile() {
       try {
-        await fs.writeFile (this.path, JSON.stringify(this.products, null, this.products.length), 'utf8')
-        console.log ('Archivo creado correctamente')
-          } catch (error) {
-            console.error('error al crear el archivo', error.message)
-          }   
+        await fs.writeFile(this.path, JSON.stringify(this.products, null, '\t'), 'utf8')
+        console.log("Archivo actualizado correctamente")
+      } catch (error) {
+        console.error("Error al actualizar el archivo:", error.message)
+      }
     }
 
-    async getProducts () {
+    async updateProduct(productUpdated) {
       try {
-        const contenidoJson = await fs.readFile (this.path, 'utf8')
-        const objetoRecuperado =  JSON.parse(contenidoJson)
-        return console.log(objetoRecuperado)
+        let product = this.products.find((p) => p.id === productUpdated.id)
+        if (!product) {
+          console.error("Producto no encontrado con ID:", productUpdated.id)
+          return
+        }
+  
+        let productIndex = this.products.indexOf(product)
+        this.products[productIndex] = productUpdated
+  
+        // Actualiza el archivo después de la modificación
+        this.updateFile()
+  
+        console.log("Producto actualizado correctamente")
       } catch (error) {
-        console.error ('No se puede leer el archivo, error:', error.message)
+        console.error("Error al actualizar el producto:", error.message)
+      }
+    }
+  
+
+    async getProducts() {
+      try {
+        const contenidoJson = await fs.readFile(this.path, 'utf8');
+        if (!contenidoJson.trim()) {
+          console.log('Archivo vacío. Aun no hay productos cargados.');
+          return []; // Devuelve un array vacío si el archivo está vacío
+        }
+        const objetoRecuperado = JSON.parse(contenidoJson);
+        console.log(objetoRecuperado);
+        return objetoRecuperado; // Devuelve el array de productos
+      } catch (error) {
+        console.error('No se puede leer el archivo, error:', error.message);
       }
     }
 
@@ -59,23 +90,42 @@ class ProductManager {
         const contenidoJson = await fs.readFile (this.path, 'utf8')
         const objetoRecuperado =  JSON.parse(contenidoJson)
         const findID = objetoRecuperado.find (product => product.id === id)
-        if (findID) return findID
+        if (findID) return console.log (findID)
       } catch (error) {
           console.log ('Not Found')
         } 
     }
+  }
+
+
+async function test() {
+  const productManager = new ProductManager('./archivo/products.json')
+
+  // Obtener los productos agregados
+  const productsBeforeAdd = await productManager.getProducts()
+  console.log("Productos antes de agregar:", productsBeforeAdd)
+
+  // Agregar productos de prueba
+  await productManager.addProduct('producto prueba1', 'Este es un producto prueba', 200, 'sin imagen', 'abc123', 25)
+
+  // Obtener los productos despues de agregar el de prueba
+  const productsAfterAdd = await productManager.getProducts()
+  console.log("Productos despues de agregar:", productsAfterAdd)
 }
 
+test()
 
-const productManager = new ProductManager('./archivo/products.json')
-productManager.addProduct('producto prueba1', 'Este es un producto prueba', 200, 'sin imagen', 'abc123', 25)
-productManager.addProduct('producto prueba2', 'Este es un producto prueba', 200, 'sin imagen', 'abc1234', 25)
-productManager.addProduct('producto prueba3', 'Este es un producto prueba', 200, 'sin imagen', 'abc12345', 25)
-productManager.addProduct('producto prueba3', 'Este es un producto prueba', 200, 'sin imagen', 'abc123456', 25)
+/* //modifico producto por id
+await productManager.updateProduct({
+  id: 1,
+  title: 'producto modificado',
+  description: 'Este es un producto modificado',
+  price: 300,
+  thumbnail: 'imagen modificada',
+  code: 'abc567',
+  stock: 30,
+}) 
+ */
 
-
-//obtener los productos agregados
-console.log (productManager.getProducts())
-
-//buscar por id
-console.log (productManager.getProductByID(2))
+/* //buscar por id
+await productManager.getProductByID(2) */
